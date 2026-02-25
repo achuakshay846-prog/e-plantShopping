@@ -1,49 +1,84 @@
-
-import React, { useState } from 'react';
-import ProductList from './ProductList';
-import './App.css';
-import AboutUs from './AboutUs';
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import ProductList from "./ProductList";
+import CartItem from "./CartItem";
+import AboutUs from "./AboutUs";
+import "./App.css";
 
 function App() {
-  
-  const [showProductList, setShowProductList] = useState(false);
+  const [showProducts, setShowProducts] = useState(false);
+  const [showCart, setShowCart] = useState(false);
 
-  const handleGetStartedClick = () => {
-    setShowProductList(true);
+  // Get cart items from Redux store
+  const cartItems = useSelector((state) => state.cart.items);
+
+  // Calculate total quantity
+  const totalItems = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  const handleGetStarted = () => {
+    setShowProducts(true);
   };
 
-  const handleHomeClick = () => {
-    setShowProductList(false);
+  const handleShowCart = () => {
+    setShowCart(true);
+    setShowProducts(false);
+  };
+
+  const handleShowProducts = () => {
+    setShowProducts(true);
+    setShowCart(false);
   };
 
   return (
-    <div className="app-container">
-      <div className={`landing-page ${showProductList ? 'fade-out' : ''}`}>
-        <div className="background-image"></div>
-        <div className="content">
-         <div className="landing_content">
-         <h1>Welcome To Paradise Nursery</h1>
-          <div className="divider"></div>
-          <p>Where Green Meets Serenity</p>
-         
-          <button className="get-started-button" onClick={handleGetStartedClick}>
-            Get Started
-          </button>
-         </div>
-          <div className="aboutus_container">
-          <AboutUs/>
+    <div>
+      {/* Landing Page */}
+      {!showProducts && !showCart && (
+        <div className="landing-page">
+          <div className="background-image"></div>
+          <div className="content">
+            <h1>Paradise Nursery</h1>
+            <p>Bringing Nature Closer to You 🌿</p>
+            <button onClick={handleGetStarted}>Get Started</button>
           </div>
-          </div>
+        </div>
+      )}
 
-      </div>
-      <div className={`product-list-container ${showProductList ? 'visible' : ''}`}>
-        <ProductList onHomeClick={handleHomeClick}/>
-      </div>
+      {/* Products Page */}
+      {showProducts && !showCart && (
+        <>
+          <nav className="navbar">
+            <h2>Paradise Nursery</h2>
+            <div>
+              <button onClick={handleShowProducts}>Products</button>
+              <button onClick={handleShowCart}>
+                Cart 🛒 ({totalItems})
+              </button>
+            </div>
+          </nav>
+          <AboutUs />
+          <ProductList />
+        </>
+      )}
+
+      {/* Cart Page */}
+      {showCart && (
+        <>
+          <nav className="navbar">
+            <h2>Paradise Nursery</h2>
+            <div>
+              <button onClick={handleShowProducts}>
+                Back to Products
+              </button>
+            </div>
+          </nav>
+          <CartItem />
+        </>
+      )}
     </div>
   );
 }
 
 export default App;
-
-
-
